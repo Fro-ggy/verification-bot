@@ -4,7 +4,7 @@
  * Uses YOUR bot token; the token is read from the environment and never sent anywhere except discord.com.
  *
  * Token sources (first found wins):
- *   1. DISCORD_BOT_TOKEN environment variable (hosted use, e.g. Railway)
+ *   1. DISCORD_BOT_TOKEN (or DISCORD_TOKEN) environment variable (hosted use, e.g. Railway)
  *   2. A file named by DISCORD_ENV_FILE containing a line like DISCORD_TOKEN=xxxx
  *
  * Hosted mode (default): also needs MCP_SECRET (32+ chars); clients send 'Authorization: Bearer <secret>' to POST /mcp.
@@ -26,7 +26,8 @@ import crypto from 'node:crypto';
 const API = 'https://discord.com/api/v10';
 
 function loadToken() {
-  if (process.env.DISCORD_BOT_TOKEN) return process.env.DISCORD_BOT_TOKEN.trim();
+  const envToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+  if (envToken) return envToken.trim();
   const file = process.env.DISCORD_ENV_FILE;
   if (file && fs.existsSync(file)) {
     const line = fs.readFileSync(file, 'utf8').split(/\r?\n/).find((l) => /^\s*DISCORD_TOKEN\s*=/.test(l));
