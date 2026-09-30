@@ -1,0 +1,13 @@
+{
+  "name": "kain-class-photo-bot",
+  "version": "1.0.0",
+  "description": "Standalone Discord bot that collects and validates sprite submissions for the yearly Kain class photo",
+  "main": "index.js",
+  "scripts": { "start": "node index.js", "test": "node --test" },
+  "engines": { "node": ">=18.0.0" },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1"
+  }
+}
