@@ -7,7 +7,7 @@
  *   1. DISCORD_BOT_TOKEN (or DISCORD_TOKEN) environment variable (hosted use, e.g. Railway)
  *   2. A file named by DISCORD_ENV_FILE containing a line like DISCORD_TOKEN=xxxx
  *
- * Hosted mode (default): also needs MCP_SECRET (32+ chars); clients send 'Authorization: Bearer <secret>' to POST /mcp.
+ * Hosted mode (default): also needs MCP_SECRET (32+ chars); clients send 'Authorization: Bearer <secret>' (or 'X-API-Key: <secret>') to POST /mcp.
  * Local mode: run with --stdio.
  *
  * Optional safety rails:
@@ -187,7 +187,9 @@ if (process.argv.includes('--stdio')) {
   const secretBuf = Buffer.from(SECRET);
   const authorized = (req) => {
     const h = req.headers['authorization'] || '';
-    const given = Buffer.from(h.startsWith('Bearer ') ? h.slice(7) : '');
+    const key = req.headers['x-api-key'];
+    const raw = h.startsWith('Bearer ') ? h.slice(7) : (typeof key === 'string' ? key : h);
+    const given = Buffer.from(raw.trim());
     return given.length === secretBuf.length && crypto.timingSafeEqual(given, secretBuf);
   };
   const readBody = (req) => new Promise((resolve, reject) => {
