@@ -1,0 +1,17 @@
+{
+  "name": "kain-discord-mcp",
+  "version": "1.0.0",
+  "description": "Minimal Discord MCP server (hosted or local) (post, edit, pin, read, create channel) using your own bot token",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
