@@ -37,6 +37,7 @@ function loadToken() {
 
 const TOKEN = loadToken();
 const ALLOWED = (process.env.DISCORD_ALLOWED_CHANNELS || '').split(',').map((s) => s.trim()).filter(Boolean);
+const ANY_CHANNEL = ALLOWED.includes('*'); // explicit opt-out: DISCORD_ALLOWED_CHANNELS=*
 
 async function discord(method, path, body) {
   if (!TOKEN) throw new Error('No bot token found. Set DISCORD_BOT_TOKEN or DISCORD_ENV_FILE.');
@@ -60,7 +61,7 @@ async function discord(method, path, body) {
 }
 
 function guard(channelId) {
-  if (ALLOWED.length && !ALLOWED.includes(channelId)) {
+  if (ALLOWED.length && !ANY_CHANNEL && !ALLOWED.includes(channelId)) {
     throw new Error(`Channel ${channelId} is not in DISCORD_ALLOWED_CHANNELS.`);
   }
 }
@@ -179,7 +180,7 @@ if (process.argv.includes('--stdio')) {
     process.exit(1);
   }
   if (!ALLOWED.length) {
-    console.error('Refusing to start: set DISCORD_ALLOWED_CHANNELS (comma-separated channel IDs) so a leaked secret can only write where you intend.');
+    console.error('Refusing to start: set DISCORD_ALLOWED_CHANNELS to comma-separated channel IDs (recommended), or * to allow every channel the bot can see.');
     process.exit(1);
   }
   const secretBuf = Buffer.from(SECRET);
