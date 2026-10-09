@@ -157,6 +157,8 @@ async function logSubmission(interaction, { ign, server, kind, name, buf, update
   try {
     const channel = await interaction.client.channels.fetch(config.SUBMISSION_LOG_CHANNEL_ID);
     if (!channel || !channel.isTextBased()) return;
+    // Plain-text username: a mention would show as "@unknown-user" because mentions are silenced (allowedMentions parse: []).
+    const who = interaction.user.username.replace(/([\\*_~`|>])/g, '\\$1');
     const files = [new AttachmentBuilder(buf, { name: kind === 'png' ? 'sprite.png' : (name || 'sprite.zip') })];
     if (kind === 'zip') {
       try {
@@ -165,7 +167,7 @@ async function logSubmission(interaction, { ign, server, kind, name, buf, update
       } catch { /* preview is best effort */ }
     }
     await channel.send({
-      content: `${updated ? 'Updated' : 'New'} submission: **${ign}** (${server}) from <@${interaction.user.id}> \`${kind}\``,
+      content: `${updated ? 'Updated' : 'New'} submission: **${ign}** (${server}) from ${who} \`${kind}\``,
       files,
       allowedMentions: { parse: [] },
     });
