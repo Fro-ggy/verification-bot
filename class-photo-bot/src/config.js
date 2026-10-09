@@ -7,6 +7,7 @@ module.exports = {
   GUILD_ID: process.env.GUILD_ID,
   VERIFIED_ROLE_ID: process.env.VERIFIED_ROLE_ID || '1174862374411456582',
   ANNOUNCE_CHANNEL_ID: process.env.ANNOUNCE_CHANNEL_ID || null,
+  SUBMISSION_LOG_CHANNEL_ID: process.env.SUBMISSION_LOG_CHANNEL_ID || null,
   ADMIN_ROLE_ID: process.env.ADMIN_ROLE_ID || null,
   SERVERS: list(
     process.env.SERVERS,

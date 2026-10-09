@@ -147,7 +147,31 @@ async function submit(interaction, store) {
     ign, server, kind, file, originalName: att.name, submittedAt: Date.now(),
   });
   if (old) fs.rmSync(store.spritePath(old.file), { force: true });
+  await logSubmission(interaction, { ign, server, kind, name: att.name, buf, updated: !!old });
   return interaction.editReply(`${old ? 'Updated' : 'Received'}: **${ign}** (${server}). You can resubmit any time before the deadline.`);
+}
+
+// Mirrors each accepted submission into an optional staff channel. Never blocks or fails a submission.
+async function logSubmission(interaction, { ign, server, kind, name, buf, updated }) {
+  if (!config.SUBMISSION_LOG_CHANNEL_ID) return;
+  try {
+    const channel = await interaction.client.channels.fetch(config.SUBMISSION_LOG_CHANNEL_ID);
+    if (!channel || !channel.isTextBased()) return;
+    const files = [new AttachmentBuilder(buf, { name: kind === 'png' ? 'sprite.png' : (name || 'sprite.zip') })];
+    if (kind === 'zip') {
+      try {
+        const entry = new AdmZip(buf).getEntries().find((e) => /(^|\/)stand1_0\.png$/i.test(e.entryName));
+        if (entry) files.push(new AttachmentBuilder(entry.getData(), { name: 'preview.png' }));
+      } catch { /* preview is best effort */ }
+    }
+    await channel.send({
+      content: `${updated ? 'Updated' : 'New'} submission: **${ign}** (${server}) from <@${interaction.user.id}> \`${kind}\``,
+      files,
+      allowedMentions: { parse: [] },
+    });
+  } catch (e) {
+    console.error('Could not post to submission log channel:', e.message);
+  }
 }
 
 async function status(interaction, store) {
